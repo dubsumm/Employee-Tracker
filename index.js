@@ -33,7 +33,20 @@ const mainMenu = async () => {
       case 'View all Dpts.':
         dptView();
         break;
-    }
+    
+      case 'View all Roles':
+        roleView();
+        break;
+      
+      case 'View all Employees':
+        empView();
+        break;
+      
+      case 'Add a Dpt.':
+        addDpt();
+        break;
+  }
+
 
 
   } catch(err) {
@@ -60,7 +73,65 @@ const dptView = async () => {
     console.log(err);
         mainMenu();
   };
-
-
 }
 
+const roleView = async () => {
+  try {
+    console.log('\n------------ All Roles ------------\n');
+    let query = 'SELECT * FROM jobrole';
+    db.query(query, function(err,res) {
+      if (err) throw err;
+      let roleArray = [];
+      res.forEach(role => {
+        roleArray.push(role)
+      });
+      console.table(roleArray);
+      mainMenu();
+    });
+  } catch(err) {
+    console.log(err);
+        mainMenu();
+  };
+}
+
+const empView = async () => {
+  try {
+    console.log('\n------------ All Employees ------------\n');
+    let query = 'SELECT * FROM employee';
+    db.query(query, function(err,res) {
+      if (err) throw err;
+      let empArray = [];
+      res.forEach(emp => {
+        empArray.push(emp)
+      });
+      console.table(empArray);
+      mainMenu();
+    });
+  } catch(err) {
+    console.log(err);
+        mainMenu();
+  };
+}
+
+const addDpt = async () => {
+  try {
+    console.log('\n------------ Add Department ------------\n');
+    let answer = await inquirer.prompt({
+      type: 'input',
+      name: 'newDpt',
+      message: 'What is the name of the new dpt.?',
+    })
+    // let format = answer.newDpt.toUpperCase() this doesnt work yet
+    // console.log(format);
+    await db.query('INSERT INTO department SET ?', {
+      department_name: answer.newDpt
+      })
+
+      console.log(`\n${answer.newDpt} has been added to departments\n`);
+      mainMenu();
+
+  } catch(err) {
+    console.log(err);
+    mainMenu();
+  };
+}
