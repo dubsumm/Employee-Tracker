@@ -45,6 +45,10 @@ const mainMenu = async () => {
       case 'Add a Dpt.':
         addDpt();
         break;
+
+      case 'Add a Role':
+        addRole();
+        break;
   }
 
 
@@ -59,8 +63,8 @@ const mainMenu = async () => {
 const dptView = async () => {
   try {
     console.log('\n------------ All Departments ------------\n');
-    let query = 'SELECT * FROM department';
-    db.query(query, function(err,res) {
+    let query1 = 'SELECT * FROM department';
+    db.query(query1, function(err,res) {
       if (err) throw err;
       let dptArray = [];
       res.forEach(dpt => {
@@ -128,6 +132,54 @@ const addDpt = async () => {
       })
 
       console.log(`\n${answer.newDpt} has been added to departments\n`);
+      mainMenu();
+
+  } catch(err) {
+    console.log(err);
+    mainMenu();
+  };
+}
+
+const addRole = async () => {
+  try {
+    console.log('\n------------ Add Role ------------\n');
+    let roleName = await inquirer.prompt({
+      type: 'input',
+      name: 'newRoleName',
+      message: 'What is the name of the new Role?',
+    });
+    let roleSal = await inquirer.prompt(
+    {
+      type: 'input',
+      name: 'newRoleSal',
+      message: 'What is the salary of the new Role in dollars$?',
+      
+    });
+
+    let dpts = await db.query("SELECT * FROM department");
+
+    let roleDpt = await inquirer.prompt(
+      {
+        type: 'list',
+        name: 'newRoleDpt',
+        message: 'What is the Dpt. of the new Role?',
+        choices: dpts.map((newRoleDpt) => {
+            return {
+              name: newRoleDpt.department_name,
+              value: newRoleDpt.id
+            }
+        })
+        
+      });
+    
+    await db.query('INSERT INTO jobrole SET ?', {
+      title: roleName.newRoleName,
+      salary: roleSal.newRoleSal,
+      department_id: roleDpt.newRoleDpt
+
+      })
+
+      console.log(`\n${roleName.newRoleName} has been added to Roles\n`);
       mainMenu();
 
   } catch(err) {
